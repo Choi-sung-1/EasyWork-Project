@@ -1,5 +1,6 @@
 package com.example.EasyWork.Project.service;
 
+import com.example.EasyWork.Project.domain.dto.RootDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class PublicDataService {
 
-    public JsonNode getPublicData() throws  JsonProcessingException {
+    public RootDTO getPublicData() throws  JsonProcessingException {
 //        JSON 행정안전부_대한민국 공공서비스(혜택) 정보
         String url = "https://api.odcloud.kr/api/gov24/v3/serviceList"
                 +"?page=1"
@@ -25,14 +26,14 @@ public class PublicDataService {
         String url2 = "https://www.youthcenter.go.kr/go/ythip/getPlcy"
                     +"?apiKeyNm=33142eb1-009c-4456-bb7d-c7887f95bca8"
                     +"&pageNum=1"
-                    +"&pageSize=10"
+                    +"&pageSize=1"
                     +"&returnType=JSON";
+
         RestTemplate restTemplate = new RestTemplate();
-        String xml = restTemplate.getForObject(url2, String.class);
+        String json =  restTemplate.getForObject(url2, String.class);;
 
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode root = objectMapper.readTree(xml);
-        return root.path("result").path("youthPolicyList");
+        return objectMapper.readValue(json, RootDTO.class);
     }
 
 }
