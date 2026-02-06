@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.EasyWork.Project.mapper.MemberMapper">
+    <insert id="insertMember" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO TBL_MEMBER(EMAIL, NAME, LOGIN_ID, PWD)
+        VALUES (#{email},#{name},#{loginId}, #{pwd})
+    </insert>
+
+
+
+    <select id="selectPwdByLoginId">
+        SELECT ID, PWD FROM TBL_MEMBER
+        WHERE LOGIN_ID=#{loginId}
+    </select>
+    <select id="selectCartList">
+        SELECT TC.CART_ID,TP.PRODUCT_ID,TI.IMAGE_ORIGINAL_NAME,TP.PRODUCT_NAME,TP.PRODUCT_PRICE,TC.CART_QUANTITY,TP.PRODUCT_STOCK
+        FROM TBL_CART TC
+                 INNER JOIN TBL_PRODUCT TP on TP.PRODUCT_ID = TC.PRODUCT_ID
+                 INNER JOIN TBL_IMAGES TI on TP.PRODUCT_ID = TI.REFERENCE_ID
+        WHERE TC.MEMBER_ID =#{memberId} AND TI.MAIN_IMAGE = 'Y'
+    </select>
+    <update id="update">
+        UPDATE TBL_CART
+        SET CART_QUANTITY = #{cartQuantity}
+        WHERE CART_ID = #{cartId}
+    </update>
+    <delete id="delete">
+        DELETE FROM TBL_CART
+        WHERE CART_ID = #{cartId}
+    </delete>
+    <delete id="deleteAll">
+        DELETE FROM TBL_CART
+        WHERE MEMBER_ID=#{memberId}
+    </delete>
+</mapper>
