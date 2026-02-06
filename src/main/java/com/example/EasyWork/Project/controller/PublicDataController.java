@@ -23,5 +23,6 @@ public class PublicDataController {
         List<PolicyDTO> policyDTOList = root.getResult().getPolicyList();
         publicDataService.writePublicDate(policyDTOList);
         return root.getResult().getPolicyList();
+
     }
 }
