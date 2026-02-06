@@ -1,4 +1,4 @@
-package com.example.EasyWork.Project.domain.dto;
+package com.example.EasyWork.Project.domain.dto.policy;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
