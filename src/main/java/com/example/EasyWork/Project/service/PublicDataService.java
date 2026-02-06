@@ -1,21 +1,28 @@
 package com.example.EasyWork.Project.service;
 
-import com.example.EasyWork.Project.domain.dto.RootDTO;
+import com.example.EasyWork.Project.converter.PolicyDataConverter;
+import com.example.EasyWork.Project.domain.dto.policy.PolicyDTO;
+import com.example.EasyWork.Project.domain.dto.policy.RootDTO;
+import com.example.EasyWork.Project.domain.vo.policy.*;
+import com.example.EasyWork.Project.repository.PublicDataDAO;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PublicDataService {
 
+    private final PublicDataDAO publicDataDAO;
+    private final PolicyDataConverter policyDataConverter;
     public RootDTO getPublicData() throws  JsonProcessingException {
+//        한국 장학재단 공공데이터
 //        JSON 행정안전부_대한민국 공공서비스(혜택) 정보
         String url = "https://api.odcloud.kr/api/gov24/v3/serviceList"
                 +"?page=1"
@@ -26,7 +33,7 @@ public class PublicDataService {
         String url2 = "https://www.youthcenter.go.kr/go/ythip/getPlcy"
                     +"?apiKeyNm=33142eb1-009c-4456-bb7d-c7887f95bca8"
                     +"&pageNum=1"
-                    +"&pageSize=1"
+                    +"&pageSize=20"
                     +"&returnType=JSON";
 
         RestTemplate restTemplate = new RestTemplate();
@@ -34,6 +41,23 @@ public class PublicDataService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(json, RootDTO.class);
+    }
+    public void writePublicDate(List<PolicyDTO> policyDTOS) {
+
+//        컨버터 사용
+        for (PolicyDTO policyDTO : policyDTOS) {
+            PolicyMasterVO policyMasterVO = policyDataConverter.toPolicyMaster(policyDTO);
+            PolicySupportVO policySupportVO = policyDataConverter.toPolicySupport(policyDTO);
+            PolicyBusinessPeriodVO policyBusinessPeriodVO = policyDataConverter.toPolicyBusinessPeriod(policyDTO);
+            PolicyApplicationVO policyApplicationVO = policyDataConverter.toPolicyApplication(policyDTO);
+            PolicyEligibilityVO policyEligibilityVO = policyDataConverter.toPolicyEligibility(policyDTO);
+
+            publicDataDAO.insertToMaster(policyMasterVO);
+            publicDataDAO.insertToSupport(policySupportVO);
+            publicDataDAO.insertToBusinessPeriod(policyBusinessPeriodVO);
+            publicDataDAO.insertToApplication(policyApplicationVO);
+            publicDataDAO.insertToEligibility(policyEligibilityVO);
+        }
     }
 
 }
